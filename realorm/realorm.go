@@ -91,6 +91,7 @@ type ORM interface {
 	BaseModel
 
 	GetDB() *gorm.DB
+	Migrate(models ...interface{}) error
 }
 
 type orm struct {

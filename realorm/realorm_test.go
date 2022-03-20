@@ -36,7 +36,7 @@ func clear_table(t *testing.T) {
 
 func create_orm() (realorm.ORM, error) {
 	orm := realorm.New(database.SQLITE3_MEMORY_DB, database.SQLITE3)
-	err := orm.GetDB().AutoMigrate(&Post{})
+	err := orm.Migrate(&Post{})
 	return orm, err
 }
 

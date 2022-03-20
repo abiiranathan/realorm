@@ -8,7 +8,6 @@ import (
 
 	"github.com/abiiranathan/realorm/database"
 	"github.com/abiiranathan/realorm/realorm"
-	"gorm.io/gorm"
 )
 
 type Post struct {
@@ -27,32 +26,25 @@ func UniqueID() uint {
 }
 
 func clear_table(t *testing.T) {
-	db, err := create_database()
+	orm, err := create_orm()
 	if err != nil {
 		t.Errorf("error creating database: %v\n", err)
 	}
 
-	db.Exec("DELETE FROM posts;")
+	orm.GetDB().Exec("DELETE FROM posts;")
 }
 
-func create_database() (*gorm.DB, error) {
-	conn, err := database.Connect(database.SQLITE3_MEMORY_DB, database.SQLITE3)
-
-	if err != nil {
-		panic(err)
-	}
-
-	err = conn.AutoMigrate(&Post{})
-	return conn, err
+func create_orm() (realorm.ORM, error) {
+	orm := realorm.New(database.SQLITE3_MEMORY_DB, database.SQLITE3)
+	err := orm.GetDB().AutoMigrate(&Post{})
+	return orm, err
 }
 
 func create_post(t *testing.T) (*Post, realorm.ORM) {
-	db, err := create_database()
+	orm, err := create_orm()
 	if err != nil {
 		t.Errorf("error creating database: %v\n", err)
 	}
-
-	orm := realorm.New(db)
 
 	post := &Post{
 		ID:      UniqueID(),
@@ -83,20 +75,6 @@ func Test_realorm(t *testing.T) {
 	Test_realorm_Create(t)
 	Test_realorm_Update(t)
 	Test_realorm_Delete(t)
-	Test_realorm_GetDB(t)
-}
-
-func Test_realorm_GetDB(t *testing.T) {
-	db, err := create_database()
-	if err != nil {
-		t.Errorf("error creating database: %v\n", err)
-	}
-
-	orm := realorm.New(db)
-
-	if orm.GetDB() != db {
-		t.Errorf("error getting database\n")
-	}
 }
 
 func Test_realorm_Find(t *testing.T) {
@@ -134,12 +112,10 @@ func Test_realorm_Find(t *testing.T) {
 func Test_realorm_FindAllPaginated(t *testing.T) {
 	defer clear_table(t)
 
-	db, err := create_database()
+	orm, err := create_orm()
 	if err != nil {
 		t.Errorf("error creating database: %v\n", err)
 	}
-
-	orm := realorm.New(db)
 
 	var posts []Post
 	var paginatedResult *realorm.PaginatedResult
@@ -198,12 +174,10 @@ func Test_realorm_FindAllPaginated(t *testing.T) {
 func Test_realorm_FindAll(t *testing.T) {
 	defer clear_table(t)
 
-	db, err := create_database()
+	orm, err := create_orm()
 	if err != nil {
 		t.Errorf("error creating database: %v\n", err)
 	}
-
-	orm := realorm.New(db)
 
 	var posts []Post
 	err = orm.FindAll(&posts, nil)

@@ -24,22 +24,12 @@ var (
 
 func main() {
 	flag.Parse()
-	// Connect to database
-	conn, err := database.Connect(*DSN, database.PG)
-
-	if err != nil {
-		panic(err)
-	}
-
-	if *MIGRATE {
-		conn.AutoMigrate(&Post{})
-	}
 
 	// create the orm
-	orm := realorm.New(conn)
+	orm := realorm.New(*DSN, database.PG)
 
 	// create the post
-	err = orm.Create(&Post{
+	err := orm.Create(&Post{
 		Title:   "Hello World",
 		Content: "This is a test post",
 	})

@@ -23,8 +23,7 @@ go get github.com/abiiranathan/realorm
 ```go
 
 import (
-  "github.com/abiiranathan/realorm"
-  "github.com/abiiranathan/database"
+  "github.com/abiiranathan/realorm/realorm"
 )
 
 type User struct{
@@ -49,10 +48,8 @@ func (u *User) BeforeCreate(tx *gorm.DB) error{
 ### Connect to database
 
 ```go
-// connect to postgres with data source name
-db, err := database.Connect(dsn, database.PG)
 // initialize the ORM with the db
-orm := realorm.New(db)
+orm := realorm.New(dsn, database.PG)
 
 ```
 

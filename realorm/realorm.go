@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/abiiranathan/realorm/database"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -96,7 +97,17 @@ type orm struct {
 	DB *gorm.DB
 }
 
-func New(db *gorm.DB) ORM {
+// Connect to the database with the specified dialect and connection string(dsn)
+// and returns an ORM interface for the database.
+// It panics if the database cannot be connected to.
+// The dsn is the connection string for the database or for postgres a pointer to the database.config
+// object
+func New(dsn any, dialect database.DialectString) ORM {
+	db, err := database.Connect(dsn, dialect)
+	if err != nil {
+		panic(err)
+	}
+
 	return &orm{db}
 }
 
@@ -209,4 +220,8 @@ func (o *orm) Delete(model any, where *WhereClause) error {
 
 func (o *orm) GetDB() *gorm.DB {
 	return o.DB
+}
+
+func (o *orm) Migrate(models ...interface{}) error {
+	return o.DB.AutoMigrate(models...)
 }
